@@ -2,13 +2,17 @@
 #include <menu.h>
 #include <string.h>
 
+void cursor(int startx, int starty, int cell_width, int cell_height, int rows, int cols);
+
 void tableau() {
-    int rows = 6;
+    int rows = 2;
     int cols = 5;
     int cell_width = 7;
-    int cell_height = 3;
+    int cell_height = 2;
     int totalheight = rows * cell_height;
     int totalwidth = cols * cell_width;
+
+    int cury, curx;
 
     clear();
 
@@ -70,10 +74,50 @@ void tableau() {
 
     x = startx + totalwidth;
     mvaddch(y, x, ACS_LRCORNER);
-
+    cursor(startx,starty,cell_width,cell_height,rows,cols);
 
     refresh();
 }
+void cursor(int startx, int starty, int cell_width, int cell_height, int rows, int cols){
+    int cur_row = 0;
+    int cur_col = 0;
+    int curx, cury;
+    move(starty+1, startx+1);
+    refresh();
+
+    int ch;
+    while ((ch=getch()) != 27){
+        switch(ch){
+            case KEY_DOWN:
+                cur_row+=1;
+                break;
+            case KEY_UP:
+                cur_row+= -1;
+                break;
+            case KEY_RIGHT:
+                cur_col+= 1;
+                break;
+            case KEY_LEFT:
+                cur_col+= -1;
+                break;
+        }
+        if (cur_row < 0){
+            cur_row++;
+        } else if (cur_row >= rows){
+            cur_row--;
+        } else if (cur_col < 0){
+            cur_col++;
+        } else if (cur_col > cols-1){
+            cur_col--;
+        }
+        curx = startx+cell_width*cur_col+1;
+        cury = starty+cell_height*cur_row+1;
+        move(cury,curx);
+    }
+    refresh();
+}
+
+
 
 int main() {
     // Menu qui permet de choisir le mode entre: 
@@ -91,6 +135,10 @@ int main() {
     noecho();
     keypad(stdscr, TRUE);
     box(stdscr, 0, 0);
+
+    const char *title = "Statistinator";
+
+    mvprintw(0, ((COLS - strlen(title)) / 2), "%s", title);
     refresh();
     items[0] = new_item("Entrer des valeurs dans le tableau", "");
     items[1] = new_item("Graphiques", "");
