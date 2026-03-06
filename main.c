@@ -2,6 +2,79 @@
 #include <menu.h>
 #include <string.h>
 
+void tableau() {
+    int rows = 6;
+    int cols = 5;
+    int cell_width = 7;
+    int cell_height = 3;
+    int totalheight = rows * cell_height;
+    int totalwidth = cols * cell_width;
+
+    clear();
+
+    int table_width  = cols * cell_width + (cols + 1);
+    int table_height = rows * cell_height + (rows + 1);
+
+    int startx = (COLS - table_width) / 2;
+    int starty = (LINES - table_height) / 2;
+    int h, i, j;
+    int y = starty, x = startx;
+    // Lignes horizontales
+    for (j = 0; j<=rows; j++){
+        for (i = 0; i<totalwidth; i++){
+            mvaddch(y, x+i, ACS_HLINE);
+        }
+        y += cell_height;
+    }
+    // Lignes verticales
+    y = starty;
+    x = startx;
+    for (j = 0; j<=cols; j++){
+        for (i=0; i<totalheight; i++){
+            mvaddch(y+i, x, ACS_VLINE);
+        }
+        x += cell_width;
+    }
+
+    // T et croix
+    x = startx;
+    for (j = 0; j <= cols; j++){
+        for (i = 0; i <= rows; i++){
+            y = starty + cell_height * i;
+            if (x == startx){
+                mvaddch(y,x,ACS_LTEE);
+            }else if (y == starty){
+                mvaddch(y,x,ACS_TTEE);
+            }else if (x == startx + totalwidth){
+                mvaddch(y,x,ACS_RTEE);
+            }else if (y == starty + totalheight){
+                mvaddch(y,x,ACS_BTEE);
+            }
+            else{
+                mvaddch(y,x,ACS_PLUS);
+            }
+        }
+        x += cell_width;
+    }
+        // Bordures
+    x = startx;
+    y = starty;
+
+    mvaddch(y, x, ACS_ULCORNER);
+    x = startx + totalwidth;
+    mvaddch(y, x, ACS_URCORNER);
+    
+    y = starty + totalheight;
+    x = startx;
+    mvaddch(y, x, ACS_LLCORNER);
+
+    x = startx + totalwidth;
+    mvaddch(y, x, ACS_LRCORNER);
+
+
+    refresh();
+}
+
 int main() {
     // Menu qui permet de choisir le mode entre: 
     // Entrer des valeurs
@@ -18,6 +91,7 @@ int main() {
     noecho();
     keypad(stdscr, TRUE);
     box(stdscr, 0, 0);
+    refresh();
     items[0] = new_item("Entrer des valeurs dans le tableau", "");
     items[1] = new_item("Graphiques", "");
     items[2] = new_item("Afficher les variables","");
@@ -44,7 +118,7 @@ int main() {
     box(menu_win, 0, 0);
 
     set_menu_win(menu, menu_win);
-    set_menu_sub(menu, derwin(menu_win, n_items, menu_width - 2, 1, 1));
+    set_menu_sub(menu,  derwin(menu_win, n_items, menu_width - 2, 1, 1));
     set_menu_mark(menu, " > ");
 
     post_menu(menu);
@@ -60,8 +134,21 @@ int main() {
                 menu_driver(menu, REQ_UP_ITEM);
                 break;
             case 10: // Entrée
-                if(item_index(current_item(menu)) == n_items - 1) { // Quitter
+                ITEM *cur = current_item(menu);
+                int idx = item_index(cur);
+
+                if(idx == n_items - 1){ // Quitter
                     goto exit_loop;
+                }
+                if(idx == n_items - 4){
+                    // Supprimer le menu et afficher le tableau
+                    unpost_menu(menu);
+                    wclear(menu_win);
+                    wrefresh(menu_win);
+                    delwin(menu_win);
+                    clear();
+                    refresh();
+                    tableau();
                 }
                 break;
         }
