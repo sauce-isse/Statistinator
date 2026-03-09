@@ -3,6 +3,7 @@
 #include <string.h>
 
 void cursor(int startx, int starty, int cell_width, int cell_height, int rows, int cols);
+void mainmenu(MENU *menu, WINDOW *menu_win, ITEM *items[], int n_items);
 
 void tableau() {
     int rows = 2;
@@ -168,7 +169,13 @@ int main() {
     set_menu_win(menu, menu_win);
     set_menu_sub(menu,  derwin(menu_win, n_items, menu_width - 2, 1, 1));
     set_menu_mark(menu, " > ");
+    mainmenu(menu, menu_win, items, n_items);
 
+    return 0;
+}
+
+void mainmenu(MENU *menu, WINDOW *menu_win, ITEM *items[], int n_items){
+    int i;
     post_menu(menu);
     wrefresh(menu_win);
 
@@ -210,6 +217,5 @@ exit_loop:
     for(i = 0; i < n_items; ++i) free_item(items[i]);
     delwin(menu_win);
     endwin();
-
-    return 0;
+    return;
 }
