@@ -221,7 +221,8 @@ void mainmenu(MENU *menu, WINDOW *menu_window, ITEM *items[], int n_items){
                     clear();
                     refresh();
                     tableau();
-
+                    
+                    noecho();
                     clear();
                     box(stdscr, 0,0);
                     mvprintw(0, ((COLS - strlen(title)) / 2), "%s", title);
